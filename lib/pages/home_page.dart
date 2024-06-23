@@ -11,14 +11,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _controller = TextEditingController();
-  List todoList = [
-    ["Make Pasta", false],
-    ["Eat", false]
-  ];
+  List todoList = [];
   void checkBoxChanged(bool? value, int index) {
     setState(() {
       todoList[index][1] = !todoList[index][1];
     });
+  }
+
+  void saveNewTask() {
+    setState(() {
+      todoList.add([_controller.text, false]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
   }
 
   void createNewTask() {
@@ -27,8 +32,16 @@ class _HomePageState extends State<HomePage> {
         builder: (context) {
           return DialogBox(
             controller: _controller,
+            onSave: saveNewTask,
+            onCancel: () => {Navigator.of(context).pop(), _controller.clear()},
           );
         });
+  }
+
+  void deleteTask(int index) {
+    setState(() {
+      todoList.removeAt(index);
+    });
   }
 
   @override
@@ -52,7 +65,8 @@ class _HomePageState extends State<HomePage> {
           return TodoTile(
               taskName: todoList[index][0],
               onChanged: (value) => checkBoxChanged(value, index),
-              taskCompleted: todoList[index][1]);
+              taskCompleted: todoList[index][1],
+              deleteFunction: (context) => deleteTask(index));
         },
       ),
     );
